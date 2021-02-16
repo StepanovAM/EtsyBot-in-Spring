@@ -1,27 +1,27 @@
 package com.digital.art.stuidoz.etsybot.services.proxy.providers;
 
-import com.digital.art.stuidoz.etsybot.services.HTTPClientService;
+import com.digital.art.stuidoz.etsybot.models.ProxyHost;
+import com.digital.art.stuidoz.etsybot.services.HTTPClient;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public abstract class ProxyProvider implements ProxyHostProvider{
 	
-	protected Map<String, Integer> hosts = new HashMap<>();
+	protected List<ProxyHost> hosts = new ArrayList<>();
 	
 	public abstract List<String> getUrls();
 	public abstract void parseResponse(StringBuilder response);
 	
-	public Map<String, Integer> remoteHosts(){
+	public List<ProxyHost> remoteHosts(){
 		return hosts;
 	};
-	public void setHosts(Map<String, Integer> hosts) {
+	public void setHosts(List<ProxyHost>hosts) {
 		this.hosts = hosts;
 	}
 	public void updateHosts() {
-		HTTPClientService httpClient = new HTTPClientService();
+		HTTPClient httpClient = new HTTPClient();
 		getUrls().forEach(url -> {
 			try {
 				httpClient.openConnection(url);

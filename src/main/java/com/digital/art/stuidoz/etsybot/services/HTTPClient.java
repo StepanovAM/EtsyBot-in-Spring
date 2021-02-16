@@ -1,35 +1,35 @@
 package com.digital.art.stuidoz.etsybot.services;
 
+import com.digital.art.stuidoz.etsybot.models.ProxyHost;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.Proxy;
-import java.net.URL;
-import java.util.ArrayList;
+import java.net.*;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.HttpsURLConnection;
-
-public class HTTPClientService {
+@Service
+@Scope("prototype")
+public class HTTPClient {
     private HttpURLConnection connection;
     private Proxy webProxy;
     private Map<String, String> sessCookies = new HashMap<>();
 
-    public HTTPClientService() {}
+    public HTTPClient() {}
 
-    public HTTPClientService(String proxyIp, int proxyPort, String type) {
+    public HTTPClient(ProxyHost proxyHost, String type) {
         switch(type) {
-            case "HTTP": webProxy  = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyIp, proxyPort)); break;
-            case "SOCKS": webProxy  = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIp, proxyPort)); break;
-            default: webProxy  = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyIp, proxyPort)); break;
+            case "HTTP": webProxy  = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost.getIp(), proxyHost.getPort())); break;
+            case "SOCKS": webProxy  = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyHost.getIp(), proxyHost.getPort())); break;
+            default: webProxy  = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost.getIp(), proxyHost.getPort())); break;
         }
     }
 
@@ -67,19 +67,15 @@ public class HTTPClientService {
         connection.setRequestProperty(key, value);
     }
 
-    public void connect() throws IOException {
-        connection.connect();
-    }
+    public void connect() throws IOException {connection.connect(); }
 
-    public int getResponseCode() throws IOException {
-        return connection.getResponseCode();
-    }
+    public int getResponseCode() throws IOException { return connection.getResponseCode(); }
 
     public List<String> separateResponseCookieFromMeta(){
         Map<String,List<String>> headers = connection.getHeaderFields();
         List<String> localCookies = headers.get("set-cookie") == null ? headers.get("Set-Cookie") : headers.get("set-cookie");
 
-        return localCookies != null ? localCookies.parallelStream().map(str -> str.split(";")[0]).collect(Collectors.toList()) : new ArrayList<>();
+        return localCookies != null ? localCookies.parallelStream().map(str -> str.split(";")[0]).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     public void setDefaultOptions(String method) throws Exception {
@@ -120,6 +116,11 @@ public class HTTPClientService {
 
     public Map<String, String> getSessCokies() {
         return sessCookies;
+    }
+
+
+    public String getProxyInfo(){
+        return webProxy.toString();
     }
 
 }

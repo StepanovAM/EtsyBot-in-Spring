@@ -1,5 +1,6 @@
 package com.digital.art.stuidoz.etsybot.services.proxy.providers;
 
+import com.digital.art.stuidoz.etsybot.models.ProxyHost;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ProxyListProxyProvider extends ProxyProvider{
 		Stream.of(response.toString().split(System.lineSeparator())).forEach(str -> {
 			if(pattern.matcher(str).matches()) {
 				String split[] =  str.split(":");
-				hosts.put(split[0], Integer.parseInt(split[1]));
+				hosts.add(new ProxyHost(split[0], Integer.parseInt(split[1])));
 			}
 		});
 	}

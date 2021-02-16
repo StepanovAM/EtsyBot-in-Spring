@@ -2,6 +2,7 @@ package com.digital.art.stuidoz.etsybot.services.proxy.providers;
 
 import java.util.List;
 
+import com.digital.art.stuidoz.etsybot.models.ProxyHost;
 import com.digital.art.stuidoz.etsybot.services.proxy.providers.json.foxtools.ResponseJSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ public class FoxToolsProxyProvider extends ProxyProvider {
 		try {
 			System.out.println(json);
 			response = new ObjectMapper().readValue(json.toString(), FoxToolsProxyProvider.class).getResponse();
-			response.getItems().forEach(result -> hosts.put(result.getIp(), result.getPort()));
+			response.getItems().forEach(result -> hosts.add(new ProxyHost(result.getIp(), result.getPort())));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
